@@ -1,16 +1,20 @@
+// index.js
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-
 const Person = require('./models/person')
+
+// Importa los middlewares personalizados
+const { unknownEndpoint, errorHandler } = require('./middleware/middleware.js')
 
 const app = express()
 
+// Middlewares generales
 app.use(express.static('dist'))
 app.use(express.json())
 app.use(cors())
 
-// Configuración de morgan para registrar la información del cuerpo en POST
+// Configuración de morgan para registrar el cuerpo en POST
 morgan.token('body', (req) => {
     if (req.method === 'POST') {
         return JSON.stringify(req.body)
@@ -19,12 +23,11 @@ morgan.token('body', (req) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-// Ruta principal
+// Rutas principales
 app.get('/', (req, res) => {
     res.send('<h1>Esta API REST de Personas</h1>')
 })
 
-// Ruta /info: muestra la cantidad de personas en la base de datos y la fecha actual
 app.get('/info', (req, res, next) => {
     Person.countDocuments({})
         .then(count => {
@@ -35,16 +38,12 @@ app.get('/info', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// GET /api/persons: devuelve todas las personas
 app.get('/api/persons', (req, res, next) => {
     Person.find({})
-        .then(persons => {
-            res.json(persons)
-        })
+        .then(persons => res.json(persons))
         .catch(error => next(error))
 })
 
-// GET /api/persons/:id: devuelve una persona por su id
 app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
@@ -57,7 +56,6 @@ app.get('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-// POST /api/persons: agrega una nueva persona a la base de datos
 app.post('/api/persons', (req, res, next) => {
     const { name, number } = req.body
 
@@ -76,11 +74,7 @@ app.post('/api/persons', (req, res, next) => {
                 })
             }
 
-            const person = new Person({
-                name,
-                number
-            })
-
+            const person = new Person({ name, number })
             return person.save()
         })
         .then(savedPerson => {
@@ -95,7 +89,11 @@ app.put('/api/persons/:id', (req, res, next) => {
     const { name, number } = req.body
     const updatedPerson = { name, number }
 
-    Person.findByIdAndUpdate(req.params.id, updatedPerson, { new: true, runValidators: true, context: 'query' })
+    Person.findByIdAndUpdate(
+        req.params.id,
+        updatedPerson,
+        { new: true, runValidators: true, context: 'query' }
+    )
         .then(result => {
             if (result) {
                 res.json(result)
@@ -106,8 +104,6 @@ app.put('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-
-// DELETE /api/persons/:id: elimina una persona por su id
 app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then(result => {
@@ -120,15 +116,11 @@ app.delete('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
+// Usa el middleware para endpoints desconocidos
+app.use(unknownEndpoint)
 
-// Middleware para manejo de errores
-app.use((error, req, res, next) => {
-    console.error(error.message)
-    if (error.name === 'CastError') {
-        return res.status(400).send({ error: 'malformatted id' })
-    }
-    next(error)
-})
+// Usa el middleware centralizado para manejo de errores
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
