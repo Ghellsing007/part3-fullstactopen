@@ -1,4 +1,4 @@
-require('dotenv').config()
+
 const mongoose = require('mongoose')
 
 const url = process.env.MONGODB_URI
@@ -6,6 +6,7 @@ const url = process.env.MONGODB_URI
 console.log(process.env.SU)
 console.log(process.env.SALUDOS)
 console.log(process.env.MONGODB_URI)
+
 
 mongoose.set('strictQuery', false)
 
