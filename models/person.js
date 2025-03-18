@@ -16,10 +16,15 @@ mongoose.connect(url)
 
 // Definición del esquema y modelo para la persona
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-    minlength: 3,
-    required: true,
+    name: { 
+        type: String, 
+        minlength: 3,  // ✅ Validación de mínimo 3 caracteres
+        required: true // ✅ Obligatorio
+    },
+    number: { 
+        type: String, 
+        required: true  // ✅ El número también debe ser obligatorio
+    }
 })
 
 // Configurar la transformación para convertir _id a id y eliminar __v
