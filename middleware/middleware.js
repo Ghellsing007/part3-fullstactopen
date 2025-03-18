@@ -8,16 +8,15 @@ const unknownEndpoint = (req, res) => {
   // Middleware centralizado para el manejo de errores
   const errorHandler = (error, req, res, next) => {
     console.error(error.message)
-  
-    if (error.name === 'CastError') {
-      return res.status(400).send({ error: 'malformatted id' })
-    }
+
     if (error.name === 'ValidationError') {
-      return res.status(400).json({ error: error.message })
+        // ✅ Extrae solo el mensaje de error limpio
+        const errores = Object.values(error.errors).map(err => err.message)
+        return res.status(400).json({ error: errores.join(' ') }) // ✅ Unir todos los errores en una sola respuesta
     }
-  
+
     next(error)
-  }
+}
   
   module.exports = { unknownEndpoint, errorHandler }
   
