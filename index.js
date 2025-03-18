@@ -5,6 +5,10 @@ const cors = require('cors')
 const Person = require('./models/person')
 
 
+console.log(process.env.SU)
+console.log(process.env.SALUDOS)
+console.log(process.env.MONGODB_URI)
+
 // Importa los middlewares personalizados
 const { unknownEndpoint, errorHandler } = require('./middleware/middleware.js')
 
