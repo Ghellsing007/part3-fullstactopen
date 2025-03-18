@@ -1,7 +1,7 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI
+const url = 'mongodb+srv://root:root@cluster0.1cmxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
 mongoose.set('strictQuery', false)
 
