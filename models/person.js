@@ -18,6 +18,8 @@ mongoose.connect(url)
 const personSchema = new mongoose.Schema({
     name: String,
     number: String,
+    minlength: 3,
+    required: true,
 })
 
 // Configurar la transformación para convertir _id a id y eliminar __v
