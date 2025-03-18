@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 const url = 'mongodb+srv://root:root@cluster0.1cmxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
-
+console.log(process.env.SU)
 
 
 mongoose.set('strictQuery', false)
